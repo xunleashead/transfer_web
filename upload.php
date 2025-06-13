@@ -62,8 +62,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["file"])) {
                 'Bucket' => 'my-file-hosting-bucket',
                 'Key'    => $s3Key,
                 'SourceFile' => $file["tmp_name"],
-                'ContentType' => $file["type"],
-                'ACL'    => 'public-read'
+                'ContentType' => $file["type"]
+                
             ]);
 
             $stmt = $pdo->prepare("INSERT INTO files (user_id, filename, filepath, s3_key) VALUES (?, ?, ?, ?)");
