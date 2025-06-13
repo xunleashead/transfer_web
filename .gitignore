@@ -1,0 +1,19 @@
+# Ignore vendor directory (used for Composer)
+vendor/
+
+# Ignore log files
+*.log
+
+# Ignore environment config
+.env
+bfg.jar
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore uploads (if you don’t want to push user files)
+uploads/
+
+# Ignore editor settings
+.vscode/
+.jar
