@@ -238,7 +238,7 @@ $files = $stmt->fetchAll();
             <?php foreach ($files as $file): ?>
                 <div class="file-card">
                     <p><strong><?php echo htmlspecialchars($file['filename']); ?></strong></p>
-                    <a href="<?php echo $file['filepath']; ?>" download>⬇️ Download</a>
+                    <a href="<?php echo $file['filepath']; ?>" download="<?php echo htmlspecialchars($file['filename']); ?>">⬇️ Download</a>
                     <p class="timestamp">Uploaded: <?php echo date('Y-m-d H:i', strtotime($file['upload_time'])); ?></p>
                     <a href="?delete=<?php echo $file['id']; ?>" onclick="return confirm('Delete this file?')" style="background:#dc3545;">🗑 Delete</a>
                 </div>
