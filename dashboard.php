@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once 'config.php';
+
 if (!isset($_SESSION["user_id"])) {
     header("Location: login.php");
     exit();
@@ -7,6 +9,20 @@ if (!isset($_SESSION["user_id"])) {
 
 $username = $_SESSION["username"];
 $plan = $_SESSION["plan"];
+
+// Handle upgrade request
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upgrade'])) {
+    $stmt = $pdo->prepare("UPDATE users SET plan = 'premium' WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $_SESSION['plan'] = 'premium';
+    header("Location: dashboard.php");
+    exit();
+}
+
+// Get file count
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM files WHERE user_id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$file_count = $stmt->fetchColumn();
 ?>
 
 <!DOCTYPE html>
@@ -90,6 +106,29 @@ $plan = $_SESSION["plan"];
             background: #218838;
         }
 
+        .info-box {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: <?php echo $plan === 'premium' ? '#d4edda' : '#fff3cd'; ?>;
+            color: <?php echo $plan === 'premium' ? '#155724' : '#856404'; ?>;
+            font-weight: bold;
+        }
+
+        .upgrade-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .upgrade-btn:hover {
+            background-color: #0056b3;
+        }
+
         @media (max-width: 480px) {
             header h1 {
                 font-size: 1.5rem;
@@ -107,6 +146,22 @@ $plan = $_SESSION["plan"];
     </header>
 
     <main>
+        <div class="info-box">
+            <?php if ($plan === 'premium'): ?>
+                🎉 You're on the <strong>Premium Plan</strong>. Enjoy unlimited uploads!
+            <?php else: ?>
+                ⚠️ You're on the <strong>Free Plan</strong>. You can only upload 2 files.
+            <?php endif; ?>
+        </div>
+
+        <?php if ($plan === 'free'): ?>
+            <form method="POST">
+                <button type="submit" name="upgrade" class="upgrade-btn">💎 Upgrade to Premium</button>
+            </form>
+        <?php endif; ?>
+
+        <p>📦 Files Uploaded: <strong><?php echo $file_count; ?></strong></p>
+
         <div class="dashboard-grid">
             <section class="card">
                 <h2>📖 About Me</h2>
@@ -122,12 +177,11 @@ $plan = $_SESSION["plan"];
                 </ul>
             </section>
 
-         <section class="card">
-            <h2>📤 Upload Files</h2>
-            <a class="upload-btn" href="upload.php">Upload Now</a><br><br>
-            <a class="upload-btn" href="logout.php" style="background: #dc3545;">Logout</a>
-        </section>
-
+            <section class="card">
+                <h2>📤 Upload Files</h2>
+                <a class="upload-btn" href="upload.php">Upload Now</a><br><br>
+                <a class="upload-btn" href="logout.php" style="background: #dc3545;">Logout</a>
+            </section>
         </div>
     </main>
 </body>
